@@ -1,5 +1,6 @@
 obj
-KFS*
+KFS-*
+KFS.iso
 *.a
 iso
 .vscode
