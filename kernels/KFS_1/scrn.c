@@ -3,6 +3,7 @@ void *memcpy(void *dest, void const *src, int count);
 void *memsetw(void *dest, short int val, int count);
 int strlen(const char *s);
 void outb(unsigned short port, unsigned char value);
+void move_csr(void);
 
 /* This values are set for 80x25 QEMU mode */
 #define WIDTH 80
@@ -36,7 +37,8 @@ void scroll(void)
     if (csr_y >= ROWS)
     {
         temp = csr_y - ROWS + 1;
-        memcpy(screens[current_screen].buffer, textmemptr + temp * WIDTH, (ROWS - temp) * WIDTH * 2);
+        memcpy(screens[current_screen].buffer, textmemptr + temp * WIDTH,
+               (ROWS - temp) * WIDTH * 2);
 
         memsetw(textmemptr + (ROWS - temp) * WIDTH, blank, WIDTH);
         csr_y = ROWS - 1;
@@ -114,7 +116,7 @@ void putc(char c, int screen_index)
     }
 }
 
-void print(char *text)
+void printstr(char *text)
 {
     int i;
     for (i = 0; i < strlen(text); i++)
@@ -196,8 +198,8 @@ static char logo[] =
     "\t | |    \\ . | |   ; '._,' '  \n"
     "\t(___ ) (___|___)   '.___.'   \n"
     "====================================================\n"
-    "Welcome to KFS, Use the F1-F2-F3-F4 to switch screen\n"
-    "====================================================\n";
+    "Welcome to KFS-1! \n";
+
 
 /* Function to copy logo data into each screen's buffer */
 void init()
@@ -207,7 +209,10 @@ void init()
         cls(i);
         switch_screen_color(i);
         puts(logo, i);
-        screens[i].csr_y = 15;
+        puts("Use the F1-F2-F3-F4 to change TTY. Current:", i);
+        putc((char)(i + 1 + '0'), i);
+        puts("\n====================================================\n", i);
+        screens[i].csr_y = 16;
     }
     switch_screen(0);
 }
