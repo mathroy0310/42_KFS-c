@@ -1,16 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: maroy <maroy@student.42.fr>                +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/06/04 13:01:20 by maroy             #+#    #+#              #
-#    Updated: 2024/06/05 01:28:06 by maroy            ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-
 ARCH = i386
 ARCH_FLAGS = -m32
 CPU = -march=$(ARCH)
@@ -29,6 +16,12 @@ LDFLAGS = -m elf_i386 -T kernels/linker-i386.ld
 GRUB_CFG = grub/grub.cfg # GRUB configuration file
 
 KERNEL_OBJ_DIR = obj/
+
+# Color definitions for output
+CYAN=\033[0;36m
+GREEN=\033[0;32m
+YELLOW=\033[0;33m
+NC=\033[0m
 
 # **************************************************************************** #
 ##########
@@ -59,7 +52,9 @@ KERNELS = $(KFS_1) $(KFS_2)
 ISO = KFS.iso
 ISO_DIR = grub/iso/
 
-all: $(KERNEL_OBJ_DIR) $(KERNELS) $(ISO)
+.PHONY: all clean fclean re iso run
+
+all: $(KERNEL_OBJ_DIR) $(KFS_1_OBJ_DIR) $(KFS_2_OBJ_DIR) $(ISO)
 
 # **************************************************************************** #
 
@@ -71,15 +66,16 @@ $(KERNEL_OBJ_DIR) $(KFS_1_OBJ_DIR) $(KFS_2_OBJ_DIR):
 # KFS_1 #
 ##########
 
+.PHONY: KFS-1
 KFS-1: $(KFS_1)
 
-$(KFS_1_OBJ_DIR)%.o: $(KFS_1_SRC_DIR)%.c | $(KFS_1_OBJ_DIR)
+$(KFS_1_OBJ_DIR)%.o: $(KFS_1_SRC_DIR)%.c
+	@echo "Compiling $<"
 	@$(CC) $(CFLAGS) -c $< -o $@
-	@echo "Compiled $(KFS_1_SRC_DIR)$< to $@"
 
-$(KFS_1_OBJ_DIR)%.o: $(KFS_1_SRC_DIR)%.s | $(KFS_1_OBJ_DIR)
+$(KFS_1_OBJ_DIR)%.o: $(KFS_1_SRC_DIR)%.s
+	@echo "Assembling $<"
 	@$(NASM) $(AFLAGS) $< -o $@
-	@echo "Assembled $(KFS_1_SRC_DIR)$< to $@"
 
 $(KFS_1): $(KFS_1_OBJ)
 	@$(LD) $(LDFLAGS) -o $@ $^ &>/dev/null
@@ -90,15 +86,16 @@ $(KFS_1): $(KFS_1_OBJ)
 # KFS_2 #
 ##########
 
+.PHONY: KFS-2
 KFS-2: $(KFS_2)
 
-$(KFS_2_OBJ_DIR)%.o: $(KFS_2_SRC_DIR)%.c | $(KFS_2_OBJ_DIR)
+$(KFS_2_OBJ_DIR)%.o: $(KFS_2_SRC_DIR)%.c
+	@echo "Compiling $<"
 	@$(CC) $(CFLAGS) -c $< -o $@
-	@echo "Compiled $(KFS_2_SRC_DIR)$< to $@"
 
-$(KFS_2_OBJ_DIR)%.o: $(KFS_2_SRC_DIR)%.s | $(KFS_2_OBJ_DIR)
+$(KFS_2_OBJ_DIR)%.o: $(KFS_2_SRC_DIR)%.s
+	@echo "Assembling $<"
 	@$(NASM) $(AFLAGS) $< -o $@
-	@echo "Assembled $(KFS_2_SRC_DIR)$< to $@"
 
 $(KFS_2): $(KFS_2_OBJ)
 	@$(LD) $(LDFLAGS) -o $@ $^ &>/dev/null
@@ -108,16 +105,15 @@ $(KFS_2): $(KFS_2_OBJ)
 
 iso: $(ISO)
 
-$(ISO): $(KERNELS)
+$(ISO): $(KERNELS) $(GRUB_CFG)
 	@echo "Creating the $(ISO_DIR) directory"
 	@mkdir -pv $(ISO_DIR)/boot/grub > /dev/null
-	@mv $(KERNELS) $(ISO_DIR)/boot
+	@cp $(KERNELS) $(ISO_DIR)/boot
 	@cp $(GRUB_CFG) $(ISO_DIR)/boot/grub
 	@echo "Creating the $(ISO) file"
 	@xorriso -outdev 'stdio:KFS.iso' &>/dev/null
 	@find $(ISO_DIR)/boot -name 'KFS*.bin' -exec bash -c 'grub-file --is-x86-multiboot "{}"' \;
 	@grub-mkrescue -o $(ISO) $(ISO_DIR) &>/dev/null
-	@mv $(ISO) $(ISO_DIR)
 	@echo -e "$(GREEN)$@ DONE$(NC)"
 
 # **************************************************************************** #
@@ -127,19 +123,14 @@ clean:
 	@echo -e "$(GREEN)$@ DONE$(NC)"
 
 fclean: clean
-	@rm -rf $(ISO_DIR)
+	@rm -rf $(ISO_DIR) $(ISO)
 	@echo -e "$(GREEN)$@ DONE$(NC)"
 # **************************************************************************** #
 
 re: fclean all
 
 # **************************************************************************** #
-run:
-	@echo -e "$(CYAN)QEMU Booting KFS..."
+run: $(ISO)
+	@echo -e "$(CYAN)QEMU Booting KFS...$(NC)"
 	@echo -e "$(YELLOW)KFS LOG:$(NC)" 
 	@qemu-system-i386 -s -m 2G -M q35 -cdrom $(ISO_DIR)$(ISO) -boot d -debugcon stdio
-	
-CYAN=\033[0;36m
-GREEN=\033[0;32m
-YELLOW=\033[0;33m
-NC=\033[0m
