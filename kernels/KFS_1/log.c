@@ -6,7 +6,7 @@
 /*   By: maroy <maroy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 00:45:16 by maroy             #+#    #+#             */
-/*   Updated: 2024/06/05 00:45:17 by maroy            ###   ########.fr       */
+/*   Updated: 2024/06/05 12:11:10 by maroy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,5 @@ void log(char *str, ...)
             outb(DEBUGCON_SERIAL_PORT, format[i]);
         i++;
     }
+    outb(DEBUGCON_SERIAL_PORT, '\n');
 }
