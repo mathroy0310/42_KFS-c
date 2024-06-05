@@ -16,12 +16,12 @@ Follow these instructions to get a copy of the project up and running on your lo
 - GRUB bootloader utilities (grub-mkrescue, grub-file)
 - Xorriso
 
-Installing Prerequisites on Debian-Based systems
+Installing Prerequisites with `apt-get`
 ```bash
 sudo apt-get install qemu nasm gcc grub2-common xorriso
 ```
 
-Installing Prerequisites on Arch-Based systems
+Installing Prerequisites with `pacman`
 ```bash
 sudo pacman -S qemu nasm gcc grub xorriso
 ```
