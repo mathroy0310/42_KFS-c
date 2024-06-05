@@ -6,7 +6,7 @@
 #    By: maroy <maroy@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/04 13:01:20 by maroy             #+#    #+#              #
-#    Updated: 2024/06/05 00:51:29 by maroy            ###   ########.fr        #
+#    Updated: 2024/06/05 01:28:06 by maroy            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,20 +14,19 @@
 ARCH = i386
 ARCH_FLAGS = -m32
 CPU = -march=$(ARCH)
-LANG = -std=c89
 
 # **************************************************************************** #
 
-CC = /usr/bin/gcc $(ARCH_FLAGS) $(CPU) $(LANG)
+CC = gcc $(ARCH_FLAGS) $(CPU)
 CFLAGS = -nostdlib -nodefaultlibs -fno-builtin -fno-exceptions -fno-stack-protector -Wall -Wextra -g3
 
-NASM = /usr/bin/nasm
+NASM = nasm
 AFLAGS = -f elf
 
-LD = /usr/bin/ld
+LD = ld
 LDFLAGS = -m elf_i386 -T kernels/linker-i386.ld
 
-GRUB_CFG = grub/grub.cfg
+GRUB_CFG = grub/grub.cfg # GRUB configuration file
 
 KERNEL_OBJ_DIR = obj/
 
@@ -72,6 +71,8 @@ $(KERNEL_OBJ_DIR) $(KFS_1_OBJ_DIR) $(KFS_2_OBJ_DIR):
 # KFS_1 #
 ##########
 
+KFS-1: $(KFS_1)
+
 $(KFS_1_OBJ_DIR)%.o: $(KFS_1_SRC_DIR)%.c | $(KFS_1_OBJ_DIR)
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled $(KFS_1_SRC_DIR)$< to $@"
@@ -81,52 +82,64 @@ $(KFS_1_OBJ_DIR)%.o: $(KFS_1_SRC_DIR)%.s | $(KFS_1_OBJ_DIR)
 	@echo "Assembled $(KFS_1_SRC_DIR)$< to $@"
 
 $(KFS_1): $(KFS_1_OBJ)
-	@echo "Linking ..."
-	@$(LD) $(LDFLAGS) -o $@ $^
-	@echo "$@ binary is ready !"
+	@$(LD) $(LDFLAGS) -o $@ $^ &>/dev/null
+	@echo -e "$(GREEN)$@ DONE$(NC)"
 
 # **************************************************************************** #
 ##########
 # KFS_2 #
 ##########
 
+KFS-2: $(KFS_2)
+
 $(KFS_2_OBJ_DIR)%.o: $(KFS_2_SRC_DIR)%.c | $(KFS_2_OBJ_DIR)
 	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiled $(KFS_2_SRC_DIR)$< to $@"
 
 $(KFS_2_OBJ_DIR)%.o: $(KFS_2_SRC_DIR)%.s | $(KFS_2_OBJ_DIR)
 	@$(NASM) $(AFLAGS) $< -o $@
+	@echo "Assembled $(KFS_2_SRC_DIR)$< to $@"
 
 $(KFS_2): $(KFS_2_OBJ)
-	@echo "Linking ..."
-	@$(LD) $(LDFLAGS) -o $@ $^
-	@echo "$@ binary is ready !"
+	@$(LD) $(LDFLAGS) -o $@ $^ &>/dev/null
+	@echo -e "$(GREEN)$@ DONE$(NC)"
 	
 # **************************************************************************** #
 
+iso: $(ISO)
+
 $(ISO): $(KERNELS)
 	@echo "Creating the $(ISO_DIR) directory"
-	@mkdir -pv $(ISO_DIR)/boot/grub
+	@mkdir -pv $(ISO_DIR)/boot/grub > /dev/null
 	@mv $(KERNELS) $(ISO_DIR)/boot
 	@cp $(GRUB_CFG) $(ISO_DIR)/boot/grub
 	@echo "Creating the $(ISO) file"
+	@xorriso -outdev 'stdio:KFS.iso' &>/dev/null
 	@find $(ISO_DIR)/boot -name 'KFS*.bin' -exec bash -c 'grub-file --is-x86-multiboot "{}"' \;
-	@grub-mkrescue -o $(ISO) $(ISO_DIR)
+	@grub-mkrescue -o $(ISO) $(ISO_DIR) &>/dev/null
 	@mv $(ISO) $(ISO_DIR)
+	@echo -e "$(GREEN)$@ DONE$(NC)"
 
 # **************************************************************************** #
 
 clean:
-	@echo "Cleaning obj ..."
 	@rm -rf $(KERNEL_OBJ_DIR)
+	@echo -e "$(GREEN)$@ DONE$(NC)"
 
 fclean: clean
-	@echo "Cleaning ISO and Bin ..."
 	@rm -rf $(ISO_DIR)
+	@echo -e "$(GREEN)$@ DONE$(NC)"
 # **************************************************************************** #
 
-re: clean all
+re: fclean all
 
 # **************************************************************************** #
-run: $(ISO)
+run:
+	@echo -e "$(CYAN)QEMU Booting KFS..."
+	@echo -e "$(YELLOW)KFS LOG:$(NC)" 
 	@qemu-system-i386 -s -m 2G -M q35 -cdrom $(ISO_DIR)$(ISO) -boot d -debugcon stdio
 	
+CYAN=\033[0;36m
+GREEN=\033[0;32m
+YELLOW=\033[0;33m
+NC=\033[0m
