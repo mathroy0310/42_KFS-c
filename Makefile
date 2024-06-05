@@ -44,7 +44,7 @@ KFS_2_SRC = $(wildcard $(KFS_2_SRC_DIR)*.s) $(wildcard $(KFS_2_SRC_DIR)*.c) $(wi
 KFS_2_OBJ = $(patsubst $(KFS_2_SRC_DIR)%.s, $(KFS_2_OBJ_DIR)%.o, $(filter %.s, $(KFS_2_SRC))) \
              $(patsubst $(KFS_2_SRC_DIR)%.c, $(KFS_2_OBJ_DIR)%.o, $(filter %.c, $(KFS_2_SRC)))
 
-KERNELS = $(KFS_1) #$(KFS_2)
+KERNELS = $(KFS_1) $(KFS_2)
 
 #########
 # IMAGE #
@@ -113,6 +113,7 @@ $(ISO): $(KERNELS) $(GRUB_CFG)
 	@echo "Creating the $(ISO) file"
 	@xorriso -outdev 'stdio:KFS.iso' &>/dev/null
 	@find $(ISO_DIR)/boot -name 'KFS*.bin' -exec bash -c 'grub-file --is-x86-multiboot "{}"' \;
+#@grub-mkrescue -o $(ISO) --compress=xz $(ISO_DIR) &>/dev/null
 	@grub-mkrescue -o $(ISO) $(ISO_DIR) &>/dev/null
 	@cp $(ISO) $(ISO_DIR)
 	@echo -e "$(GREEN)$@ DONE$(NC)"
