@@ -1,31 +1,20 @@
+bits 32
 
-.set ALIGN,    1<<0            
-.set MEMINFO,  1<<1             
-.set FLAGS,    ALIGN | MEMINFO 
-.set MAGIC,    0x1BADB002       
-.set CHECKSUM, -(MAGIC + FLAGS) 
+section .multiboot               ;according to multiboot spec
+        dd 0x1BADB002            ;set magic number for bootloader
+        dd 0x0                   ;set flags
+        dd - (0x1BADB002 + 0x0)  ;set checksum
 
-.section .multiboot
-.align 4
-.long MAGIC
-.long FLAGS
-.long CHECKSUM
+section .text
+global start
+extern kmain                      ; the C
 
-.section .bss
-.align 16
-stack_bottom:
-.skip 16384 # 16 KiB
-stack_top:
+start:
+        cli                      ;block interrupts
+        mov esp, stack_space     ;set stack pointer
+        call kmain
+        hlt                      ;halt the CPU
 
-
-.section .text
-.global _start
-.type _start, @function
-_start:
-	mov $stack_top, %esp
-	call main
-	cli
-1:	hlt
-	jmp 1b
-
-.size _start, . - _start
+section .bss
+resb 8192                        ; stack size : 8KB
+stack_space:
