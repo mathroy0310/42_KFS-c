@@ -114,6 +114,7 @@ $(ISO): $(KERNELS) $(GRUB_CFG)
 	@xorriso -outdev 'stdio:KFS.iso' &>/dev/null
 	@find $(ISO_DIR)/boot -name 'KFS*.bin' -exec bash -c 'grub-file --is-x86-multiboot "{}"' \;
 	@grub-mkrescue -o $(ISO) $(ISO_DIR) &>/dev/null
+	@cp $(ISO) $(ISO_DIR)
 	@echo -e "$(GREEN)$@ DONE$(NC)"
 
 # **************************************************************************** #
@@ -123,7 +124,7 @@ clean:
 	@echo -e "$(GREEN)$@ DONE$(NC)"
 
 fclean: clean
-	@rm -rf $(ISO_DIR) $(ISO)
+	@rm -rf $(ISO_DIR) $(ISO) $(KERNELS)
 	@echo -e "$(GREEN)$@ DONE$(NC)"
 # **************************************************************************** #
 
