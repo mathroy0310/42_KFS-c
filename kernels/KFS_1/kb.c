@@ -1,15 +1,16 @@
-#define KEYBOARD_PORT_DATA 0x60
-#define KEYBOARD_PORT_STATUS 0x64
-void log(char* str, ...);
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   kb.c                                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maroy <maroy@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/13 02:12:56 by maroy             #+#    #+#             */
+/*   Updated: 2024/06/13 02:13:27 by maroy            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#define true 1
-#define false 0
-
-unsigned char inb(unsigned short port);
-void print(char * text);
-void cls(void);
-void switch_screen(int new_screen);
-
+#include "kernel.h"
 
 char scancode_to_char(unsigned char scancode, int is_shift_pressed)
 {

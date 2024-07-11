@@ -1,18 +1,6 @@
-#define KEYBOARD_PORT_DATA 0x60
-#define KEYBOARD_PORT_STATUS 0x64
-void* memset(void* b, int c, unsigned int len);
-void log(char* str, ...);
 
-#define true 1
-#define false 0
 
-unsigned char inb(unsigned short port);
-void printstr(char* text);
-void printchar(char c);
-void clear(void);
-void switch_screen(int new_screen);
-void shell(const char* cmd);
-int strlen(const char* s);
+#include "kernel.h"
 
 char scancode_to_char(unsigned char scancode, int is_shift_pressed)
 {

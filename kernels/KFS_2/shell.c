@@ -1,18 +1,16 @@
-void outw(unsigned short port, unsigned short value);
-void outb(unsigned short port, unsigned char value);
-unsigned char inb(unsigned short port);
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   shell.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maroy <maroy@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/13 02:20:28 by maroy             #+#    #+#             */
+/*   Updated: 2024/06/13 02:20:28 by maroy            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-int strcmp(const char *s1, const char *s2);
-
-
-void printaddr(unsigned int addr, int limit);
-void printf(char *str, ...);
-
-void clear(void);
-
-#define GET_ESP(x) asm volatile("mov %%esp, %0" : "=r"(x)::)
-#define GET_EBP(x) asm volatile("mov %%ebp, %0" : "=r"(x)::)
-
+#include "kernel.h"
 
 void qemu_shutdown(void) { outw(0x604, 0x2000); }
 void reboot(void)

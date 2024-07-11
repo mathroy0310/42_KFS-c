@@ -1,9 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   scrn.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maroy <maroy@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/13 02:14:19 by maroy             #+#    #+#             */
+/*   Updated: 2024/06/13 02:14:42 by maroy            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void *memcpy(void *dest, void const *src, int count);
-void *memsetw(void *dest, short int val, int count);
-int strlen(const char *s);
-void outb(unsigned short port, unsigned char value);
-void move_csr(void);
+#include "kernel.h"
 
 /* This values are set for 80x25 QEMU mode */
 #define WIDTH 80

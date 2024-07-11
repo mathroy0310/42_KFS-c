@@ -6,12 +6,11 @@
 /*   By: maroy <maroy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 00:45:16 by maroy             #+#    #+#             */
-/*   Updated: 2024/06/05 12:11:10 by maroy            ###   ########.fr       */
+/*   Updated: 2024/06/13 15:14:14 by maroy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-void outb(unsigned short port, unsigned char value);
-#define DEBUGCON_SERIAL_PORT 0xe9 /*DEBUG CON*/
+#include "kernel.h"
 
 void log(char *str, ...)
 {
@@ -52,6 +51,29 @@ void log(char *str, ...)
                 } while (num);
                 while (j > 0)
                     outb(DEBUGCON_SERIAL_PORT, buf[--j]);
+            }
+            else if (format[i] == 'x')
+            {
+                unsigned int num = *args++;
+                char buf[32];
+                int j = 0;
+                do
+                {
+                    int digit = num % 16;
+                    if (digit < 10)
+                    {
+                        buf[j++] = '0' + digit;
+                    }
+                    else
+                    {
+                        buf[j++] = 'a' + (digit - 10);
+                    }
+                    num /= 16;
+                } while (num);
+                while (j > 0)
+                {
+                    outb(DEBUGCON_SERIAL_PORT, buf[--j]);
+                }
             }
             else
             {

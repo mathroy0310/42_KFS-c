@@ -6,12 +6,11 @@
 /*   By: maroy <maroy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 00:45:16 by maroy             #+#    #+#             */
-/*   Updated: 2024/06/05 12:11:10 by maroy            ###   ########.fr       */
+/*   Updated: 2024/06/13 02:14:13 by maroy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-void outb(unsigned short port, unsigned char value);
-#define DEBUGCON_SERIAL_PORT 0xe9 /*DEBUG CON*/
+#include "kernel.h"
 
 void log(char *str, ...)
 {

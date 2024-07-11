@@ -6,12 +6,11 @@
 /*   By: maroy <maroy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 21:51:42 by maroy             #+#    #+#             */
-/*   Updated: 2024/06/05 16:43:45 by maroy            ###   ########.fr       */
+/*   Updated: 2024/06/13 02:17:58 by maroy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#define GET_ESP(x) asm volatile("mov %%esp, %0" : "=r"(x)::)
-#define GET_EBP(x) asm volatile("mov %%ebp, %0" : "=r"(x)::)
+#include "kernel.h"
 
 void outb(unsigned short port, unsigned char value)
 {
