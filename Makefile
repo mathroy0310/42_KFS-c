@@ -44,17 +44,8 @@ KFS_2_SRC = $(wildcard $(KFS_2_SRC_DIR)*.s) $(wildcard $(KFS_2_SRC_DIR)*.c) $(wi
 KFS_2_OBJ = $(patsubst $(KFS_2_SRC_DIR)%.s, $(KFS_2_OBJ_DIR)%.o, $(filter %.s, $(KFS_2_SRC))) \
              $(patsubst $(KFS_2_SRC_DIR)%.c, $(KFS_2_OBJ_DIR)%.o, $(filter %.c, $(KFS_2_SRC)))
 # **************************************************************************** #
-##########
-# KFS_3 #
-##########
-KFS_3 = KFS-3.bin
-KFS_3_OBJ_DIR = $(KERNEL_OBJ_DIR)KFS_3/
-KFS_3_SRC_DIR = kernels/KFS_3/
-KFS_3_SRC = $(wildcard $(KFS_3_SRC_DIR)*.s) $(wildcard $(KFS_3_SRC_DIR)*.c) $(wildcard src/kernel/*.c)
-KFS_3_OBJ = $(patsubst $(KFS_3_SRC_DIR)%.s, $(KFS_3_OBJ_DIR)%.o, $(filter %.s, $(KFS_3_SRC))) \
-             $(patsubst $(KFS_3_SRC_DIR)%.c, $(KFS_3_OBJ_DIR)%.o, $(filter %.c, $(KFS_3_SRC)))
 
-KERNELS = $(KFS_1) $(KFS_2) $(KFS_3)
+KERNELS = $(KFS_1) $(KFS_2) 
 
 #########
 # IMAGE #
@@ -64,11 +55,11 @@ ISO_DIR = grub/iso/
 
 .PHONY: all clean fclean re iso run
 
-all: $(KERNEL_OBJ_DIR) $(KFS_1_OBJ_DIR) $(KFS_2_OBJ_DIR) $(KFS_3_OBJ_DIR) $(ISO)
+all: $(KERNEL_OBJ_DIR) $(KFS_1_OBJ_DIR) $(KFS_2_OBJ_DIR) $(ISO)
 
 # **************************************************************************** #
 
-$(KERNEL_OBJ_DIR) $(KFS_1_OBJ_DIR) $(KFS_2_OBJ_DIR) $(KFS_3_OBJ_DIR):
+$(KERNEL_OBJ_DIR) $(KFS_1_OBJ_DIR) $(KFS_2_OBJ_DIR) :
 	@mkdir -p $@
 
 # **************************************************************************** #
@@ -88,7 +79,7 @@ $(KFS_1_OBJ_DIR)%.o: $(KFS_1_SRC_DIR)%.s
 	@$(NASM) $(AFLAGS) $< -o $@
 
 $(KFS_1): $(KFS_1_OBJ)
-	@$(LD) $(LDFLAGS) -o $@ $^ &>/dev/null
+	@$(LD) $(LDFLAGS) -o $@ $^
 	@echo -e "$(GREEN)$@ DONE$(NC)"
 
 # **************************************************************************** #
@@ -108,30 +99,11 @@ $(KFS_2_OBJ_DIR)%.o: $(KFS_2_SRC_DIR)%.s
 	@$(NASM) $(AFLAGS) $< -o $@
 
 $(KFS_2): $(KFS_2_OBJ)
-	$(LD) $(LDFLAGS) -o $@ $^ &>/dev/null
+	$(LD) $(LDFLAGS) -o $@ $^
 	@echo -e "$(GREEN)$@ DONE$(NC)"
 	
 # **************************************************************************** #
-##########
-# KFS_3 #
-##########
 
-.PHONY: KFS-3
-KFS-3: $(KFS_3)
-
-$(KFS_3_OBJ_DIR)%.o: $(KFS_3_SRC_DIR)%.c
-	@echo "Compiling $<"
-	@$(CC) $(CFLAGS) -c $< -o $@
-
-$(KFS_3_OBJ_DIR)%.o: $(KFS_3_SRC_DIR)%.s
-	@echo "Assembling $<"
-	@$(NASM) $(AFLAGS) $< -o $@
-
-$(KFS_3): $(KFS_3_OBJ)
-	$(LD) $(LDFLAGS) -o $@ $^ &>/dev/null
-	@echo -e "$(GREEN)$@ DONE$(NC)"
-	
-# **************************************************************************** #
 
 iso: $(ISO)
 
@@ -143,8 +115,8 @@ $(ISO): $(KERNELS) $(GRUB_CFG)
 	@echo "Creating the $(ISO) file"
 	@xorriso -outdev 'stdio:KFS.iso' &>/dev/null
 	@find $(ISO_DIR)/boot -name 'KFS*.bin' -exec bash -c 'grub-file --is-x86-multiboot "{}"' \;
-#@grub-mkrescue -o $(ISO) --compress=xz $(ISO_DIR) &>/dev/null
-	@grub-mkrescue -o $(ISO) $(ISO_DIR) &>/dev/null
+	@grub-mkrescue -o $(ISO) --compress=xz $(ISO_DIR) &>/dev/null
+#@grub-mkrescue -o $(ISO) $(ISO_DIR) &>/dev/null
 	@cp $(ISO) $(ISO_DIR)
 	@echo -e "$(GREEN)$@ DONE$(NC)"
 
